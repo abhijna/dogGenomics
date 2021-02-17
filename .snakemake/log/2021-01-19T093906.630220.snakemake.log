@@ -1,0 +1,32 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	1	all
+	4	fastqc_pre
+	5
+
+rule fastqc_pre:
+    input: data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001.fastq.gz
+    output: qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.zip
+    jobid: 1
+    wildcards: read=Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001
+    resources: walltime=7200, mem=1000000000
+
+Error in rule fastqc_pre:
+    jobid: 1
+    output: qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.zip
+
+RuleException:
+CalledProcessError in line 106 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+Command ' set -euo pipefail;  
+        conda activate fqc ## version FastQC v0.11.7 was installed in the snakemake env
+        #source activate snakemake #Make a new environment and install fastqc. Replace this line with my conda env and load FastQC
+        fastqc -t 1 -f fastq -noextract -o qc/fastqc/fastq/$(dirname Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001) data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001.fastq.gz ' returned non-zero exit status 1.
+  File "/home/aparigi/dogCancer/snakemake_pipeline/Snakefile", line 106, in __rule_fastqc_pre
+  File "/usr/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-01-19T093906.630220.snakemake.log

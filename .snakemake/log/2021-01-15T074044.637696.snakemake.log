@@ -1,0 +1,4 @@
+Building DAG of jobs...
+MissingInputException in line 499 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+Missing input files for rule popCommon:
+/mnt/home/mansourt/Tamer/dogSeq/varResults/GenotypeGVCFs_output_max50.pass.combinedFiltered.vcf

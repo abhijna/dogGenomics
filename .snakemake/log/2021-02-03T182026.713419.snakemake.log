@@ -1,0 +1,51 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: walltime, mem
+Job counts:
+	count	jobs
+	2	FastqToSam
+	1	all
+	3
+
+rule FastqToSam:
+    input: data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001.fastq.gz, data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001.fastq.gz
+    output: data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam
+    jobid: 5
+    wildcards: fragment=Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001
+    resources: walltime=7200, mem=8000000000
+
+Error in rule FastqToSam:
+    jobid: 5
+    output: data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam
+
+RuleException:
+CalledProcessError in line 150 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+Command ' set -euo pipefail;  
+        name=$(basename data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001.fastq.gz)
+        SM=$(echo $name | cut -d "_" -f1)
+        LB=$(echo $name | cut -d"_" -f1,2)  ## We use <Index.Sequence> in the Illumina file name as an index to the library
+        #batch=$(basename "$(dirname data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001.fastq.gz)")
+        #if [ "$batch" != "trimmed" ];then LB=$batch.$LB;fi
+        PL="Illumina"
+        ##read Fastq 1st read, check the format.If typical, identify ID as "<instrument>:<run number>:<flowcell ID>:<lane>"
+        header=$(head -n1 <(zcat data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001.fastq.gz) | grep ':*:*:*:*:*:*')
+        if [ "$header" != "" ]; then
+            RGID=$(echo "$header" | sed 's/:/_/g' |cut -d "_" -f1,2,3,4)
+        else # "make unique ID and PU using checksum"
+            checksum=$(shasum data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001.fastq.gz | awk '{ print $1 }')
+            RGID="UnChrPU_"$checksum
+        fi
+        PU=$RGID.$LB
+
+        #source activate jdk
+	set +eu
+        source activate gatk
+	set -eu
+        #java -jar picard.jar FastqToSam
+        gatk --java-options "-Xmx6G" FastqToSam         -F1=data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001.fastq.gz         -F2=data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001.fastq.gz         -O=data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam         -SM=$SM         -LB=$LB         -PL=$PL         -RG=$RGID         -PU=$PU         --TMP_DIR="tmp/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001" ' returned non-zero exit status 1.
+  File "/home/aparigi/dogCancer/snakemake_pipeline/Snakefile", line 150, in __rule_FastqToSam
+  File "/usr/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-02-03T182026.713419.snakemake.log

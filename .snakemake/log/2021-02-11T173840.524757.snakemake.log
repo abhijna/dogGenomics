@@ -1,0 +1,33 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: walltime, mem
+Job counts:
+	count	jobs
+	1	GATK_index
+	2	align
+	1	all
+	1	bwa_index
+	1	download_ref
+	6
+
+rule download_ref:
+    output: refGenome/canFam3_chr.fa
+    jobid: 4
+    resources: walltime=1800, mem=1000000000
+
+Error in rule download_ref:
+    jobid: 4
+    output: refGenome/canFam3_chr.fa
+
+RuleException:
+ValueError in line 214 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+unexpected '{' in field name
+  File "/home/aparigi/dogCancer/snakemake_pipeline/Snakefile", line 214, in __rule_download_ref
+  File "/usr/lib/python3.6/string.py", line 190, in format
+  File "/usr/lib/python3.6/string.py", line 194, in vformat
+  File "/usr/lib/python3.6/string.py", line 204, in _vformat
+  File "/usr/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-02-11T173840.524757.snakemake.log

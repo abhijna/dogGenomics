@@ -1,0 +1,27 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	1	all
+	1	download_ref
+	2
+
+rule download_ref:
+    output: refGenome/canFam3_chr.fa
+    jobid: 6
+    resources: walltime=1800, mem=1000000000
+
+Error in rule download_ref:
+    jobid: 6
+    output: refGenome/canFam3_chr.fa
+
+RuleException:
+NameError in line 214 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+The name 'f=0;' is unknown in this context. Please make sure that you defined that variable. Also note that braces not used for variable access have to be escaped by repeating them, i.e. {{print $1}}
+  File "/home/aparigi/dogCancer/snakemake_pipeline/Snakefile", line 214, in __rule_download_ref
+  File "/usr/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-02-12T173738.669776.snakemake.log

@@ -1,0 +1,38 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	1	GATK_index
+	1	all
+	2
+
+rule GATK_index:
+    input: refGenome/canFam3_chr.fa
+    output: refGenome/gatkIndex/genome.fa, refGenome/gatkIndex/genome.fa.fai, refGenome/gatkIndex/genome.dict
+    jobid: 6
+    resources: walltime=3600, mem=8000000000
+
+Error in rule GATK_index:
+    jobid: 6
+    output: refGenome/gatkIndex/genome.fa, refGenome/gatkIndex/genome.fa.fai, refGenome/gatkIndex/genome.dict
+
+RuleException:
+CalledProcessError in line 249 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+Command ' set -euo pipefail;  
+        set +eu
+	source activate gatk4.1
+	set -eu
+	if [ ! -f refGenome/gatkIndex/genome.fa ];then ln -s ../canFam3_chr.fa refGenome/gatkIndex/genome.fa;fi
+        #module load SAMTools/1.5
+        #module load picardTools/1.89
+	samtools faidx "refGenome/gatkIndex/genome.fa"
+        java -Xmx4g -jar $PICARD/CreateSequenceDictionary.jar R refGenome/canFam3_chr.fa O refGenome/gatkIndex/genome.dict ' returned non-zero exit status 1.
+  File "/home/aparigi/dogCancer/snakemake_pipeline/Snakefile", line 249, in __rule_GATK_index
+  File "/usr/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job GATK_index since they might be corrupted:
+refGenome/gatkIndex/genome.fa, refGenome/gatkIndex/genome.fa.fai
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-02-08T144932.585558.snakemake.log

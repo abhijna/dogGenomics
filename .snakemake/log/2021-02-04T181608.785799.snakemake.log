@@ -1,0 +1,34 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: walltime, mem
+Job counts:
+	count	jobs
+	2	MarkIlluminaAdapters
+	1	all
+	3
+
+rule MarkIlluminaAdapters:
+    input: data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam
+    output: data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap_metrics.txt
+    jobid: 2
+    wildcards: fragment=Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001
+    resources: walltime=7200, mem=8000000000
+
+Error in rule MarkIlluminaAdapters:
+    jobid: 2
+    output: data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap_metrics.txt
+
+RuleException:
+CalledProcessError in line 194 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+Command ' set -euo pipefail;  
+        #module load Java/jdk1.8.0
+        set +eu
+	source activate gatk4.1
+	set -eu
+        gatk --java-options "-Xmx6G" MarkIlluminaAdapters         -I=data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam         -O=data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap.bam         -M=data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap_metrics.txt         --TMP_DIR="tmp2/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001" ' returned non-zero exit status 4.
+  File "/home/aparigi/dogCancer/snakemake_pipeline/Snakefile", line 194, in __rule_MarkIlluminaAdapters
+  File "/usr/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-02-04T181608.785799.snakemake.log

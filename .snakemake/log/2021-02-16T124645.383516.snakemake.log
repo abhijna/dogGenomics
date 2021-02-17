@@ -1,0 +1,32 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 2
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	1	download_ref
+	2
+Select jobs to execute...
+
+[Tue Feb 16 12:46:46 2021]
+rule download_ref:
+    output: refGenome/canFam3_chr.fa
+    jobid: 10
+    resources: walltime=1800, mem=1000000000
+
+Terminating processes on user request, this might take some time.
+[Tue Feb 16 12:47:02 2021]
+Error in rule download_ref:
+    jobid: 10
+    output: refGenome/canFam3_chr.fa
+    shell:
+        
+        mkdir refGenome && cd refGenome
+	    wget --timestamping 'ftp://hgdownload.cse.ucsc.edu/goldenPath/canFam3/bigZips/canFam3.fa.gz' -O canFam3.fa.gz
+	    gunzip canFam3.fa.gz
+	    cat canFam3.fa | awk '{if($1 ~ ">chrUn_"){f=0;}else if($1 ~ ">chr"){print $0;f=1;}else if(f){print $0;}}' > canFam3_chr.fa
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Complete log: /home/aparigi/dogCancer/snakemake_pipeline/.snakemake/log/2021-02-16T124645.383516.snakemake.log

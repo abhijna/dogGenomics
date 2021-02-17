@@ -1,0 +1,4 @@
+Building DAG of jobs...
+MissingInputException in line 95 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+Missing input files for rule fastqc_pre:
+data/fastq/*/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001.fastq.gz

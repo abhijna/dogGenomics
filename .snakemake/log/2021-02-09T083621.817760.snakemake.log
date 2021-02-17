@@ -1,0 +1,25 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: walltime, mem
+Job counts:
+	count	jobs
+	1	GATK_index
+	1	all
+	2
+
+rule GATK_index:
+    input: refGenome/canFam3_chr.fa
+    output: refGenome/gatkIndex/genome.fa, refGenome/gatkIndex/genome.fa.fai, refGenome/gatkIndex/genome.dict
+    jobid: 7
+    resources: walltime=3600, mem=8000000000
+
+Finished job 7.
+1 of 2 steps (50%) done
+
+localrule all:
+    input: qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.zip, qc/multiqc/fastq/multiqc_report.html, data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.bam, data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.adap_metrics.txt, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap_metrics.txt, refGenome/canFam3_chr.fa, refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.amb, refGenome/BwaIndex/genome.ann, refGenome/BwaIndex/genome.bwt, refGenome/BwaIndex/genome.pac, refGenome/BwaIndex/genome.sa, refGenome/gatkIndex/genome.fa, refGenome/gatkIndex/genome.fa.fai, refGenome/gatkIndex/genome.dict
+    jobid: 0
+
+Finished job 0.
+2 of 2 steps (100%) done

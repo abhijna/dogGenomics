@@ -1,0 +1,28 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	1	all
+	1	multiQC_pre
+	2
+
+rule multiQC_pre:
+    input: qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.html
+    output: qc/multiqc/fastq/multiqc_report.html, qc/multiqc/fastq/multiqc_data.zip
+    jobid: 3
+    resources: walltime=14400, mem=16000000000
+
+Error in rule multiQC_pre:
+    jobid: 3
+    output: qc/multiqc/fastq/multiqc_report.html, qc/multiqc/fastq/multiqc_data.zip
+
+RuleException:
+CalledProcessError in line 124 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+Command ' set -euo pipefail;  /opt/software/multiQC/1.0--singularity/bin/multiqc.img -z -o qc/multiqc/fastq qc/fastqc/fastq ' returned non-zero exit status 127.
+  File "/home/aparigi/dogCancer/snakemake_pipeline/Snakefile", line 124, in __rule_multiQC_pre
+  File "/usr/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-01-21T074857.061319.snakemake.log

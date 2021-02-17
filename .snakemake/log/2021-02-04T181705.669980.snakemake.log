@@ -1,0 +1,36 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	2	MarkIlluminaAdapters
+	1	all
+	3
+
+rule MarkIlluminaAdapters:
+    input: data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam
+    output: data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap_metrics.txt
+    jobid: 8
+    wildcards: fragment=Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001
+    resources: walltime=7200, mem=8000000000
+
+Finished job 8.
+1 of 3 steps (33%) done
+
+rule MarkIlluminaAdapters:
+    input: data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.bam
+    output: data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.adap_metrics.txt
+    jobid: 7
+    wildcards: fragment=Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001
+    resources: walltime=7200, mem=8000000000
+
+Finished job 7.
+2 of 3 steps (67%) done
+
+localrule all:
+    input: qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.zip, qc/multiqc/fastq/multiqc_report.html, data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam, data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.adap.bam
+    jobid: 0
+
+Finished job 0.
+3 of 3 steps (100%) done

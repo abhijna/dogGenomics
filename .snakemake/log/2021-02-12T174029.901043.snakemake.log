@@ -1,0 +1,19 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	1	all
+	1	download_ref
+	2
+
+rule download_ref:
+    output: refGenome/canFam3_chr.fa
+    jobid: 1
+    resources: walltime=1800, mem=1000000000
+
+Waiting at most 5 seconds for missing files.
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-02-12T174029.901043.snakemake.log

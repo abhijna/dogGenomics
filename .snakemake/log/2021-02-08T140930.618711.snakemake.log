@@ -1,0 +1,22 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	1	GATK_index
+	1	all
+	2
+
+rule GATK_index:
+    input: refGenome/canFam3_chr.fa
+    output: refGenome/gatkIndex/genome.fa, refGenome/gatkIndex/genome.fa.fai, refGenome/gatkIndex/genome.dict
+    jobid: 9
+    resources: walltime=3600, mem=8000000000
+
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job GATK_index since they might be corrupted:
+refGenome/gatkIndex/genome.fa, refGenome/gatkIndex/genome.fa.fai
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-02-08T140930.618711.snakemake.log

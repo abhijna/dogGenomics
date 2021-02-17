@@ -1,0 +1,17 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	2	align
+	1	all
+	3
+
+rule align:
+    input: data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap.bam, refGenome/BwaIndex/genome.fa, refGenome/gatkIndex/genome.fa
+    output: data/mapped_reads/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam
+    jobid: 13
+    wildcards: fragment=Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001
+    resources: walltime=28800, mem=32000000000
+

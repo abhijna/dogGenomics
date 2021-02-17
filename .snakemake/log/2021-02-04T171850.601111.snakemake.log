@@ -1,0 +1,36 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	2	FastqToSam
+	1	all
+	3
+
+rule FastqToSam:
+    input: data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001.fastq.gz, data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001.fastq.gz
+    output: data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam
+    jobid: 4
+    wildcards: fragment=Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001
+    resources: walltime=7200, mem=8000000000
+
+Finished job 4.
+1 of 3 steps (33%) done
+
+rule FastqToSam:
+    input: data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001.fastq.gz, data/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001.fastq.gz
+    output: data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.bam
+    jobid: 3
+    wildcards: fragment=Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001
+    resources: walltime=7200, mem=8000000000
+
+Finished job 3.
+2 of 3 steps (67%) done
+
+localrule all:
+    input: qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.zip, qc/multiqc/fastq/multiqc_report.html, data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam, data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.bam
+    jobid: 0
+
+Finished job 0.
+3 of 3 steps (100%) done

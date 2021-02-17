@@ -1,0 +1,35 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Unlimited resources: mem, walltime
+Job counts:
+	count	jobs
+	1	all
+	1	bwa_index
+	2
+
+rule bwa_index:
+    input: refGenome/canFam3_chr.fa
+    output: refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.amb, refGenome/BwaIndex/genome.ann, refGenome/BwaIndex/genome.bwt, refGenome/BwaIndex/genome.pac, refGenome/BwaIndex/genome.sa
+    jobid: 1
+    resources: walltime=7200, mem=16000000000
+
+Error in rule bwa_index:
+    jobid: 1
+    output: refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.amb, refGenome/BwaIndex/genome.ann, refGenome/BwaIndex/genome.bwt, refGenome/BwaIndex/genome.pac, refGenome/BwaIndex/genome.sa
+
+RuleException:
+CalledProcessError in line 230 of /home/aparigi/dogCancer/snakemake_pipeline/Snakefile:
+Command ' set -euo pipefail;  
+        if [ ! -f refGenome/BwaIndex/genome.fa ];then ln -s ../canFam3_chr.fa refGenome/BwaIndex/genome.fa;fi
+        set +eu
+	source activate bwa
+        set -eu
+	bwa index -p refGenome/BwaIndex/genome -a bwtsw refGenome/canFam3_chr.fa ' died with <Signals.SIGKILL: 9>.
+  File "/home/aparigi/dogCancer/snakemake_pipeline/Snakefile", line 230, in __rule_bwa_index
+  File "/usr/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job bwa_index since they might be corrupted:
+refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.amb, refGenome/BwaIndex/genome.ann, refGenome/BwaIndex/genome.bwt, refGenome/BwaIndex/genome.pac
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2021-02-04T201321.948230.snakemake.log

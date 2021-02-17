@@ -1,0 +1,36 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 2
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	1	bwa_index
+	2
+Select jobs to execute...
+
+[Tue Feb 16 13:47:55 2021]
+rule bwa_index:
+    input: refGenome/canFam3_chr.fa
+    output: refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.amb, refGenome/BwaIndex/genome.ann, refGenome/BwaIndex/genome.bwt, refGenome/BwaIndex/genome.pac, refGenome/BwaIndex/genome.sa
+    jobid: 11
+    resources: walltime=7200, mem=16000000000
+
+Terminating processes on user request, this might take some time.
+[Tue Feb 16 13:47:56 2021]
+Error in rule bwa_index:
+    jobid: 11
+    output: refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.amb, refGenome/BwaIndex/genome.ann, refGenome/BwaIndex/genome.bwt, refGenome/BwaIndex/genome.pac, refGenome/BwaIndex/genome.sa
+    shell:
+        
+        if [ ! -f refGenome/BwaIndex/genome.fa ];then ln -s ../canFam3_chr.fa refGenome/BwaIndex/genome.fa;fi
+        set +eu
+	source activate gatk4.1
+        set -eu
+	bwa index -p refGenome/BwaIndex/genome -a bwtsw refGenome/canFam3_chr.fa
+        
+        (one of the commands exited with non-zero exit code; note that snakemake uses bash strict mode!)
+
+Removing output files of failed job bwa_index since they might be corrupted:
+refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.pac
+Complete log: /home/aparigi/dogCancer/snakemake_pipeline/.snakemake/log/2021-02-16T134754.425841.snakemake.log
