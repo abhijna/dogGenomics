@@ -1,0 +1,32 @@
+Building DAG of jobs...
+Using shell: /bin/bash
+Provided cores: 8
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	1	bwa_index
+	2
+Select jobs to execute...
+
+[Mon Mar  8 08:59:48 2021]
+rule bwa_index:
+    input: refGenome/canFam3_chr.fa
+    output: refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.amb, refGenome/BwaIndex/genome.ann, refGenome/BwaIndex/genome.bwt, refGenome/BwaIndex/genome.pac, refGenome/BwaIndex/genome.sa
+    jobid: 11
+    resources: walltime=7200, mem=16000000000
+
+[Mon Mar  8 09:58:11 2021]
+Finished job 11.
+1 of 2 steps (50%) done
+Select jobs to execute...
+
+[Mon Mar  8 09:58:13 2021]
+localrule all:
+    input: qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R2_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001_R1_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R1_001_fastqc.zip, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.html, qc/fastqc/fastq/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001_R2_001_fastqc.zip, qc/multiqc/fastq/multiqc_report.html, data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.bam, data/uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap.bam, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN10_S19_L001.adap_metrics.txt, data/adap_uBAM/Project_TBDY_L1_DTDB05_H1220P_York_1/GN2_S6_L001.adap_metrics.txt, refGenome/canFam3_chr.fa, refGenome/BwaIndex/genome.fa, refGenome/BwaIndex/genome.amb, refGenome/BwaIndex/genome.ann, refGenome/BwaIndex/genome.bwt, refGenome/BwaIndex/genome.pac, refGenome/BwaIndex/genome.sa
+    jobid: 0
+
+[Mon Mar  8 09:58:13 2021]
+Finished job 0.
+2 of 2 steps (100%) done
+Complete log: /home/aparigi/dogCancer/snakemake_pipeline/.snakemake/log/2021-03-08T085946.571320.snakemake.log
