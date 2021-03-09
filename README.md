@@ -24,4 +24,3 @@ srun -p high -t 12:00:00 --mem=20000 --pty bash
 ```
 Use high for mapping
 
-testing auth
