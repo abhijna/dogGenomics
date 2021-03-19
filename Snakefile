@@ -69,8 +69,8 @@ rule all:
          expand("data/adap_uBAM/{fragment}.adap_metrics.txt", fragment=fragment_ids),
          "refGenome/canFam3_chr.fa",
          "refGenome/BwaIndex/genome.fa", expand("refGenome/BwaIndex/genome.{ext}", ext=['amb', 'ann', 'bwt', 'pac', 'sa']),
-       # "refGenome/gatkIndex/genome.fa", "refGenome/gatkIndex/genome.fa.fai", "refGenome/gatkIndex/genome.dict",
-       # expand("data/mapped_reads/{fragment}.bam", fragment=fragment_ids),
+	 "refGenome/gatkIndex/genome.fa", "refGenome/gatkIndex/genome.fa.fai", "refGenome/gatkIndex/genome.dict",
+	 expand("data/mapped_reads/{fragment}.bam", fragment=fragment_ids),
        # expand("data/dedup/{fragment}.bam", fragment=fragment_ids), expand("data/dedup/{fragment}.metrics.txt", fragment=fragment_ids),
        # "knowVar/canis_familiaris_SNPs.vcf", "knowVar/canis_familiaris_indels.vcf",
        # expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
@@ -296,8 +296,8 @@ rule align:
         --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 \
         --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS \
         --TMP_DIR "tmp4/{wildcards.fragment}"
-        '''
 
+        '''
 # The apprach for MarkDuplicates coded here uses coordinate-sorted and indexed bam files. Recently, the tools added a feature to accept queryname-sorted inputs that in turn by default activates additional features that will give DIFFERENT duplicate flagging results than outlined in this tutorial. Namely, if you provide MarkDuplicates a queryname-sorted BAM, then if a primary alignment is marked as duplicate, then the tool will also flag its (i) unmapped mate, (ii) secondary and/or (iii) supplementary alignment record(s) as duplicate. You can get queryname sorted BAM using SortSam tool.
 # You can simultaneously MarkDups and merge RG BAMs by providing the files altogether to MarkDuplicates by specifying each file with I= (picard) or -I (gatk). This works with coordinate-sorted alignments and should also work with queryname-sorted alignment files.
 
@@ -318,7 +318,7 @@ rule MarkDuplicates:
     shell:
         '''
         module load Java/jdk1.8.0
-        source activate gatk
+        source activate gatk4.1
         gatk --java-options "-Xmx20G" MarkDuplicates \
         --INPUT={input.bam} \
         --OUTPUT={output.bam} \
