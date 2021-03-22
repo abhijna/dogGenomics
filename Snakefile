@@ -103,11 +103,12 @@ rule fastqc_pre:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 2,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000
     threads:1
+    conda: "fqc.yml"
     shell:
         '''
-	set +eu
-        source activate fqc ## version FastQC v0.11.7 was installed in the snakemake env
-        set -eu
+	#set +eu
+        #source activate fqc ## version FastQC v0.11.7 was installed in the snakemake env
+        #set -eu
 	#source activate snakemake #Make a new environment and install fastqc. Replace this line with my conda env and load FastQC
         fastqc -t {threads} -f fastq -noextract -o qc/fastqc/fastq/$(dirname {wildcards.read}) {input}
         '''
@@ -121,11 +122,13 @@ rule multiQC_pre:
     resources:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 4,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 16000000000
+    threads:4
+    conda: "gatk4.yml"
     shell:
         '''
-        set +eu
-        source activate mqc ## version FastQC v0.11.7 was installed in the snakemake env
-        set -eu
+        #set +eu
+        #source activate mqc ## version FastQC v0.11.7 was installed in the snakemake env
+        #set -eu
         multiqc -z -o qc/multiqc/fastq /home/aparigi/dogCancer/snakemake_pipeline/qc/fastqc/fastq
         '''
 	#"/opt/software/multiQC/1.0--singularity/bin/multiqc.img -z -o qc/multiqc/fastq qc/fastqc/fastq" #change to your path!
@@ -147,6 +150,7 @@ rule FastqToSam:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 2,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 8
     threads:1
+    conda: "gatk4.yml"
     shell:
         '''
         name=$(basename {input.r1})
@@ -164,9 +168,9 @@ rule FastqToSam:
             RGID="UnChrPU_"$checksum
         fi
         PU=$RGID.$LB
-	set +eu
-        source activate gatk4.1
-	set -eu
+	#set +eu
+        #conda activate gatk4.1
+	#set -eu
         #java -jar picard.jar FastqToSam
         gatk --java-options "-Xmx6G" FastqToSam \
         -F1 {input.r1} \
@@ -190,13 +194,14 @@ rule MarkIlluminaAdapters:
     resources:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 2,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 8
-    threads:1
+    threads:4
+    conda: "gatk4.yml"
     shell:
         '''
         #module load Java/jdk1.8.0
-        set +eu
-	source activate gatk4.1
-	set -eu
+        #set +eu
+	#source activate gatk4.1
+	#set -eu
         gatk --java-options "-Xmx6G" MarkIlluminaAdapters \
         -I {input} \
         -O {output.bam} \
@@ -210,6 +215,7 @@ rule download_ref:
     resources:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 30,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000
+    threads:4
     shell:
         '''
 	mkdir -p refGenome && cd refGenome
@@ -227,13 +233,15 @@ rule bwa_index:
     resources:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 2,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 16
+    threads:4
+    conda: "gatk4.yml"
     shell:
         '''
         if [ ! -f refGenome/BwaIndex/genome.fa ];then ln -s ../canFam3_chr.fa refGenome/BwaIndex/genome.fa;fi
-        set +eu
-	export PATH=$HOME/miniconda3/bin:$PATH
-	source activate gatk4.1
-        set -eu
+        #set +eu
+	#export PATH=$HOME/miniconda3/bin:$PATH
+	#source activate gatk4.1
+        #set -eu
 	bwa index -p refGenome/BwaIndex/genome -a bwtsw {input}
         '''
 
@@ -247,17 +255,19 @@ rule GATK_index:
     resources:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 1,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 8
+    threads:4
+    conda: "gatk4.yml"
     shell:
         '''
-        set +eu
-	source activate gatk4.1
+        #set +eu
+	#source activate gatk4.1
 	if [ ! -f refGenome/gatkIndex/genome.fa ];then ln -s ../canFam3_chr.fa refGenome/gatkIndex/genome.fa;fi
         #module load SAMTools/1.5
         #module load picardTools/1.89
 	samtools faidx "refGenome/gatkIndex/genome.fa"
         #java -Xmx4g -jar $PICARD/CreateSequenceDictionary.jar R {input} O {output.dict}
 	picard CreateSequenceDictionary R={input} O={output.dict}
-	set -eu
+	#set -eu
 	'''
 
 # https://software.broadinstitute.org/gatk/documentation/tooldocs/4.0.2.0/picard_sam_SamToFastq.php
@@ -274,12 +284,13 @@ rule align:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 8,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 32
     threads:4
+    conda: "gatk4.yml"
     shell:
         '''
         #module load Java/jdk1.8.0
-        set +eu
-	source activate gatk4.1
-	set +eu
+        #set +eu
+	#conda activate gatk4.1
+	#set +eu
         #module load bwa/0.7.7.r441
         gatk --java-options "-Xmx30G" SamToFastq \
         -I {input.bam} \
