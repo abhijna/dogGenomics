@@ -71,9 +71,9 @@ rule all:
          "refGenome/BwaIndex/genome.fa", expand("refGenome/BwaIndex/genome.{ext}", ext=['amb', 'ann', 'bwt', 'pac', 'sa']),
 	 "refGenome/gatkIndex/genome.fa", "refGenome/gatkIndex/genome.fa.fai", "refGenome/gatkIndex/genome.dict",
 	 expand("data/mapped_reads/{fragment}.bam", fragment=fragment_ids),
-       # expand("data/dedup/{fragment}.bam", fragment=fragment_ids), expand("data/dedup/{fragment}.metrics.txt", fragment=fragment_ids),
-       # "knowVar/canis_familiaris_SNPs.vcf", "knowVar/canis_familiaris_indels.vcf",
-       # expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
+         expand("data/dedup/{fragment}.bam", fragment=fragment_ids), expand("data/dedup/{fragment}.metrics.txt", fragment=fragment_ids),
+         "knowVar/canis_familiaris_SNPs.vcf", "knowVar/canis_familiaris_indels.vcf",
+         expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
        # expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
        # expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
        # expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
@@ -325,19 +325,20 @@ rule MarkDuplicates:
     resources:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 4,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 24
-    threads:1
+    threads:4
+    conda: "gatk4.yml"
     shell:
         '''
-        module load Java/jdk1.8.0
-        source activate gatk4.1
+        #module load Java/jdk1.8.0
+        #source activate gatk4.1
         gatk --java-options "-Xmx20G" MarkDuplicates \
-        --INPUT={input.bam} \
-        --OUTPUT={output.bam} \
-        --METRICS_FILE={output.metrics} \
+        --INPUT {input.bam} \
+        --OUTPUT {output.bam} \
+        --METRICS_FILE {output.metrics} \
         --VALIDATION_STRINGENCY SILENT \
-        --OPTICAL_DUPLICATE_PIXEL_DISTANCE=2500 \
-        --CREATE_INDEX=true \
-        --TMP_DIR="tmp5/{wildcards.fragment}"
+        --OPTICAL_DUPLICATE_PIXEL_DISTANCE 2500 \
+        --CREATE_INDEX true \
+        --TMP_DIR "tmp5/{wildcards.fragment}"
         '''
 
 rule download_knowVar:
@@ -347,9 +348,11 @@ rule download_knowVar:
     resources:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 30,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000
+    threads:4
+    conda: "gatk4.yml"
     shell:
         '''
-        mkdir knowVar && cd knowVar
+        mkdir -p knowVar && cd knowVar
         wget 'ftp://ftp.ensembl.org/pub/release-94/variation/vcf/canis_familiaris/canis_familiaris.vcf.gz' -O canis_familiaris.vcf.gz
         gunzip canis_familiaris.vcf.gz
         ## change the name of the chromosomes to match the UCSC genome (bet keep the file co-ordinates 1-based)
@@ -360,8 +363,8 @@ rule download_knowVar:
         grep "TSA=SNV" knowVar/canis_familiaris_fixedChrNames_sorted.vcf >> knowVar/canis_familiaris_SNPs.vcf
         grep "^#" knowVar/canis_familiaris.vcf > knowVar/canis_familiaris_indels.vcf
         grep -v "TSA=SNV" knowVar/canis_familiaris_fixedChrNames_sorted.vcf >> knowVar/canis_familiaris_indels.vcf
-        module load Java/jdk1.8.0
-        source activate gatk
+        #module load Java/jdk1.8.0
+        #source activate gatk
         gatk IndexFeatureFile -F knowVar/canis_familiaris_SNPs.vcf
         gatk IndexFeatureFile -F knowVar/canis_familiaris_indels.vcf
         '''
@@ -383,10 +386,11 @@ rule BaseRecalib:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 2,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 16
     threads:1
+    conda: "gatk4.yml"
     shell:
         '''
-        module load Java/jdk1.8.0
-        source activate gatk
+        #module load Java/jdk1.8.0
+        #source activate gatk
         gatk --java-options "-Xmx15G" BaseRecalibrator \
         -R {input.ref} \
         -I {input.bam} \
@@ -410,10 +414,11 @@ rule ApplyBQSR:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 2,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 16
     threads:1
+    conda: "gatk4.yml"
     shell:
         '''
-        module load Java/jdk1.8.0
-        source activate gatk
+        #module load Java/jdk1.8.0
+        #source activate gatk
         gatk --java-options "-Xmx15G" ApplyBQSR \
         -R {input.ref} \
         -I {input.bam} \
@@ -439,6 +444,7 @@ rule Mutect2_for_PON:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 24,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 16
     threads:1
+    conda: "gatk4.yml"
     shell:
         '''
         name=$(basename {input.bam})
