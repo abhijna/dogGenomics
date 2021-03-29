@@ -73,7 +73,7 @@ rule all:
 	 expand("data/mapped_reads/{fragment}.bam", fragment=fragment_ids),
          expand("data/dedup/{fragment}.bam", fragment=fragment_ids), expand("data/dedup/{fragment}.metrics.txt", fragment=fragment_ids),
          "knowVar/canis_familiaris_SNPs.vcf", "knowVar/canis_familiaris_indels.vcf",
-       # expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
+         expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
        # expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
        # expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
        # expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
@@ -365,8 +365,8 @@ rule download_knowVar:
         grep -v "TSA=SNV" knowVar/canis_familiaris_fixedChrNames_sorted.vcf >> knowVar/canis_familiaris_indels.vcf
         #module load Java/jdk1.8.0
         #source activate gatk
-        gatk IndexFeatureFile -F knowVar/canis_familiaris_SNPs.vcf
-        gatk IndexFeatureFile -F knowVar/canis_familiaris_indels.vcf
+        gatk IndexFeatureFile -I knowVar/canis_familiaris_SNPs.vcf
+        gatk IndexFeatureFile -I knowVar/canis_familiaris_indels.vcf
         '''
 
 # https://software.broadinstitute.org/gatk/documentation/tooldocs/3.8-0/org_broadinstitute_gatk_tools_walkers_bqsr_BaseRecalibrator.php
