@@ -73,7 +73,7 @@ rule all:
 	 expand("data/mapped_reads/{fragment}.bam", fragment=fragment_ids),
          expand("data/dedup/{fragment}.bam", fragment=fragment_ids), expand("data/dedup/{fragment}.metrics.txt", fragment=fragment_ids),
          "knowVar/canis_familiaris_SNPs.vcf", "knowVar/canis_familiaris_indels.vcf",
-         expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
+       # expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
        # expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
        # expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
        # expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
