@@ -73,11 +73,12 @@ rule all:
 	 expand("data/mapped_reads/{fragment}.bam", fragment=fragment_ids),
          expand("data/dedup/{fragment}.bam", fragment=fragment_ids), expand("data/dedup/{fragment}.metrics.txt", fragment=fragment_ids),
          "knowVar/canis_familiaris_SNPs.vcf", "knowVar/canis_familiaris_indels.vcf",
-         expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
-       # expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
-       # expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
-       # expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
-       # "data/PON.vcf.gz",
+         "refGenome/intervals.bed",
+	 expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
+         expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
+         expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
+         expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
+         "data/PON.vcf.gz",
        # expand("data/rawVC/{tumFragment}.vcf.gz", tumFragment=tumFragment_ids),
        # expand("data/realign/{tumFragment}.bam", tumFragment=tumFragment_ids),
        # "data/population/commonAlt.vcf",
@@ -374,6 +375,19 @@ rule download_knowVar:
 # https://software.broadinstitute.org/gatk/documentation/article.php?id=1319
 # https://software.broadinstitute.org/gatk/documentation/article.php?id=44
 # https://gatkforums.broadinstitute.org/gatk/discussion/11081/base-quality-score-recalibration-bqsr
+rule download_intervals_bed:
+    output:"refGenome/intervals.bed"
+    shell:
+        '''
+        cd ..
+        git clone https://github.com/abhijna/dogGenomics
+        mv dogGenomics/scripts/  snakemake_pipeline/
+        cd snakemake_pipeline
+        cat scripts/OID45779_CanFam31_06Mar2017_capture_targets.bed \
+	| awk '{if($1 ~ "chrUn_"){next;}else{print $0;}}' \
+	> refGenome/intervals.bed 
+	'''
+
 rule BaseRecalib:
     input:
         bam="data/dedup/{fragment}.bam",
@@ -449,8 +463,8 @@ rule Mutect2_for_PON:
         '''
         name=$(basename {input.bam})
         SM=$(echo $name | cut -d "_" -f1)
-        module load Java/jdk1.8.0
-        source activate gatk
+        #module load Java/jdk1.8.0
+        #source activate gatk
         gatk --java-options "-Xmx15G" Mutect2 \
         -R {input.ref} \
         -I {input.bam} \
@@ -458,6 +472,18 @@ rule Mutect2_for_PON:
         -L refGenome/intervals.bed \
         -O {output.var}
         '''
+
+rule GenomicsDBImport:
+    input: 
+	expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids)
+    output: 
+    shell:
+	'''
+	pon_var=(data/PON/*/*.vcf.gz)
+	gatk --java-options "-Xmx15G" GenomicsDBImport \
+	$(printf " -V %s" "${{pon_var[@]}}") \
+    	--genomicsdb-workspace-path data/combined_somatic_PON
+	'''
 
 # https://software.broadinstitute.org/gatk/documentation/tooldocs/4.0.9.0/org_broadinstitute_hellbender_tools_walkers_mutect_CreateSomaticPanelOfNormals.php
 rule CreateSomaticPON:
@@ -469,13 +495,14 @@ rule CreateSomaticPON:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 1,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 16
     threads:1
+    conda: "gatk4.yml" 
     shell:
         '''
-        module load Java/jdk1.8.0
-        source activate gatk
+        #module load Java/jdk1.8.0
+        #source activate gatk
         pon_var=(data/PON/*/*.vcf.gz)
         gatk --java-options "-Xmx15G"  CreateSomaticPanelOfNormals \
-        $(printf " -vcfs %s" "${{pon_var[@]}}") \
+        $(printf " -V %s" "${{pon_var[@]}}") \
         -O {output}
         '''
 
