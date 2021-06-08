@@ -78,7 +78,8 @@ rule all:
          expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
          expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
          expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
-         "data/PON.vcf.gz",
+         "data/combined_somatic_PON/vcfheader.vcf",
+       #  "data/PON.vcf.gz",
        # expand("data/rawVC/{tumFragment}.vcf.gz", tumFragment=tumFragment_ids),
        # expand("data/realign/{tumFragment}.bam", tumFragment=tumFragment_ids),
        # "data/population/commonAlt.vcf",
@@ -475,15 +476,19 @@ rule Mutect2_for_PON:
 
 rule GenomicsDBImport:
     input: 
-	expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids)
-    output: 
+        expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
+    output:
+        "data/combined_somatic_PON/vcfheader.vcf", 
+    conda: "gatk4.yml"
+    threads:2
     shell:
-	'''
-	pon_var=(data/PON/*/*.vcf.gz)
-	gatk --java-options "-Xmx15G" GenomicsDBImport \
-	$(printf " -V %s" "${{pon_var[@]}}") \
-    	--genomicsdb-workspace-path data/combined_somatic_PON
-	'''
+        '''
+        pon_var=(data/PON/*/*.vcf.gz)
+        gatk --java-options "-Xmx15G" GenomicsDBImport \ 
+        $(printf " -V %s" "${{pon_var[@]}}") \
+	--genomicsdb-workspace-path data/combined_somatic_PON \
+        -L refGenome/intervals.bed
+        '''
 
 # https://software.broadinstitute.org/gatk/documentation/tooldocs/4.0.9.0/org_broadinstitute_hellbender_tools_walkers_mutect_CreateSomaticPanelOfNormals.php
 rule CreateSomaticPON:
@@ -502,7 +507,7 @@ rule CreateSomaticPON:
         #source activate gatk
         pon_var=(data/PON/*/*.vcf.gz)
         gatk --java-options "-Xmx15G"  CreateSomaticPanelOfNormals \
-        $(printf " -V %s" "${{pon_var[@]}}") \
+        $(printf " -V %s" "${pon_var[@]}") \
         -O {output}
         '''
 
