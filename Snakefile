@@ -77,7 +77,7 @@ rule all:
 	 expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
          expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
          expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
-         expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
+       #  expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
        #  "data/combined_somatic_PON/vcfheader.vcf",
        #  "data/PON.vcf.gz",
        # expand("data/rawVC/{tumFragment}.vcf.gz", tumFragment=tumFragment_ids),
@@ -108,10 +108,6 @@ rule fastqc_pre:
     conda: "fqc.yml"
     shell:
         '''
-	#set +eu
-        #source activate fqc ## version FastQC v0.11.7 was installed in the snakemake env
-        #set -eu
-	#source activate snakemake #Make a new environment and install fastqc. Replace this line with my conda env and load FastQC
         fastqc -t {threads} -f fastq -noextract -o qc/fastqc/fastq/$(dirname {wildcards.read}) {input}
         '''
 
@@ -125,12 +121,9 @@ rule multiQC_pre:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 4,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 16000000000
     threads:4
-    conda: "gatk4.yml"
+    conda: "fqc.yml"
     shell:
         '''
-        #set +eu
-        #source activate mqc ## version FastQC v0.11.7 was installed in the snakemake env
-        #set -eu
         multiqc -z -o qc/multiqc/fastq /home/aparigi/dogCancer/snakemake_pipeline/qc/fastqc/fastq
         '''
 	#"/opt/software/multiQC/1.0--singularity/bin/multiqc.img -z -o qc/multiqc/fastq qc/fastqc/fastq" #change to your path!
@@ -148,9 +141,9 @@ rule FastqToSam:
         r2="data/fastq/{fragment}_R2_001.fastq.gz"
     output:
         "data/uBAM/{fragment}.bam"
-    resources:
-        walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 2,
-        mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 8
+    #resources:
+     #   walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 2,
+      #  mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 8
     threads:1
     conda: "gatk4.yml"
     shell:
@@ -170,10 +163,6 @@ rule FastqToSam:
             RGID="UnChrPU_"$checksum
         fi
         PU=$RGID.$LB
-	#set +eu
-        #conda activate gatk4.1
-	#set -eu
-        #java -jar picard.jar FastqToSam
         gatk --java-options "-Xmx6G" FastqToSam \
         -F1 {input.r1} \
         -F2 {input.r2} \
@@ -200,10 +189,6 @@ rule MarkIlluminaAdapters:
     conda: "gatk4.yml"
     shell:
         '''
-        #module load Java/jdk1.8.0
-        #set +eu
-	#source activate gatk4.1
-	#set -eu
         gatk --java-options "-Xmx6G" MarkIlluminaAdapters \
         -I {input} \
         -O {output.bam} \
@@ -240,10 +225,6 @@ rule bwa_index:
     shell:
         '''
         if [ ! -f refGenome/BwaIndex/genome.fa ];then ln -s ../canFam3_chr.fa refGenome/BwaIndex/genome.fa;fi
-        #set +eu
-	#export PATH=$HOME/miniconda3/bin:$PATH
-	#source activate gatk4.1
-        #set -eu
 	bwa index -p refGenome/BwaIndex/genome -a bwtsw {input}
         '''
 
@@ -261,15 +242,9 @@ rule GATK_index:
     conda: "gatk4.yml"
     shell:
         '''
-        #set +eu
-	#source activate gatk4.1
 	if [ ! -f refGenome/gatkIndex/genome.fa ];then ln -s ../canFam3_chr.fa refGenome/gatkIndex/genome.fa;fi
-        #module load SAMTools/1.5
-        #module load picardTools/1.89
 	samtools faidx "refGenome/gatkIndex/genome.fa"
-        #java -Xmx4g -jar $PICARD/CreateSequenceDictionary.jar R {input} O {output.dict}
 	picard CreateSequenceDictionary R={input} O={output.dict}
-	#set -eu
 	'''
 
 # https://software.broadinstitute.org/gatk/documentation/tooldocs/4.0.2.0/picard_sam_SamToFastq.php
@@ -289,11 +264,6 @@ rule align:
     conda: "gatk4.yml"
     shell:
         '''
-        #module load Java/jdk1.8.0
-        #set +eu
-	#conda activate gatk4.1
-	#set +eu
-        #module load bwa/0.7.7.r441
         gatk --java-options "-Xmx30G" SamToFastq \
         -I {input.bam} \
         --FASTQ /dev/stdout \
@@ -309,7 +279,6 @@ rule align:
         --INCLUDE_SECONDARY_ALIGNMENTS true --MAX_INSERTIONS_OR_DELETIONS -1 \
         --PRIMARY_ALIGNMENT_STRATEGY MostDistant --ATTRIBUTES_TO_RETAIN XS \
         --TMP_DIR "tmp4/{wildcards.fragment}"
-
         '''
 # The apprach for MarkDuplicates coded here uses coordinate-sorted and indexed bam files. Recently, the tools added a feature to accept queryname-sorted inputs that in turn by default activates additional features that will give DIFFERENT duplicate flagging results than outlined in this tutorial. Namely, if you provide MarkDuplicates a queryname-sorted BAM, then if a primary alignment is marked as duplicate, then the tool will also flag its (i) unmapped mate, (ii) secondary and/or (iii) supplementary alignment record(s) as duplicate. You can get queryname sorted BAM using SortSam tool.
 # You can simultaneously MarkDups and merge RG BAMs by providing the files altogether to MarkDuplicates by specifying each file with I= (picard) or -I (gatk). This works with coordinate-sorted alignments and should also work with queryname-sorted alignment files.
@@ -331,8 +300,6 @@ rule MarkDuplicates:
     conda: "gatk4.yml"
     shell:
         '''
-        #module load Java/jdk1.8.0
-        #source activate gatk4.1
         gatk --java-options "-Xmx20G" MarkDuplicates \
         --INPUT {input.bam} \
         --OUTPUT {output.bam} \
@@ -365,8 +332,6 @@ rule download_knowVar:
         grep "TSA=SNV" knowVar/canis_familiaris_fixedChrNames_sorted.vcf >> knowVar/canis_familiaris_SNPs.vcf
         grep "^#" knowVar/canis_familiaris.vcf > knowVar/canis_familiaris_indels.vcf
         grep -v "TSA=SNV" knowVar/canis_familiaris_fixedChrNames_sorted.vcf >> knowVar/canis_familiaris_indels.vcf
-        #module load Java/jdk1.8.0
-        #source activate gatk
         gatk IndexFeatureFile -I knowVar/canis_familiaris_SNPs.vcf
         gatk IndexFeatureFile -I knowVar/canis_familiaris_indels.vcf
         '''
@@ -382,10 +347,10 @@ rule download_intervals_bed:
         '''
         cd ..
         git clone https://github.com/abhijna/dogGenomics
-        mv dogGenomics/scripts/  snakemake_pipeline/
+        mv dogGenomics/scripts/ snakemake_pipeline/
         cd snakemake_pipeline
         cat scripts/OID45779_CanFam31_06Mar2017_capture_targets.bed \
-	| awk '{if($1 ~ "chrUn_"){next;}else{print $0;}}' \
+	| awk '{{if($1 ~ "chrUn_"){next;}else{print $0;}}}' \
 	> refGenome/intervals.bed 
 	'''
 
@@ -404,8 +369,6 @@ rule BaseRecalib:
     conda: "gatk4.yml"
     shell:
         '''
-        #module load Java/jdk1.8.0
-        #source activate gatk
         gatk --java-options "-Xmx15G" BaseRecalibrator \
         -R {input.ref} \
         -I {input.bam} \
@@ -432,8 +395,6 @@ rule ApplyBQSR:
     conda: "gatk4.yml"
     shell:
         '''
-        #module load Java/jdk1.8.0
-        #source activate gatk
         gatk --java-options "-Xmx15G" ApplyBQSR \
         -R {input.ref} \
         -I {input.bam} \
