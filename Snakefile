@@ -446,8 +446,10 @@ rule GenomicsDBImport:
         extra="",  # optional
         java_opts="",  # optional
     threads:2
-    wrapper:
-        "v0.75.0/bio/gatk/genomicsdbimport"
+    script: ./genomicsdbimport.py
+    conda: ./environment.yaml
+   # wrapper:
+    #    "v0.75.0/bio/gatk/genomicsdbimport"
     #shell:
      #   '''
       #  pon_var=(data/PON/*/*.vcf.gz)
