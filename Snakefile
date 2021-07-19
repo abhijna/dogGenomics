@@ -77,7 +77,7 @@ rule all:
 	 expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
          expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
          expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
-       #  expand("data/PON/{normFragment}.vcf.gz.tbi", normFragment=normFragment_ids),
+         expand("data/combined_somatic_PON/vcfheader.vcf")
        #  "data/combined_somatic_PON/vcfheader.vcf",
        #  "data/PON.vcf.gz",
        # expand("data/rawVC/{tumFragment}.vcf.gz", tumFragment=tumFragment_ids),
@@ -430,14 +430,14 @@ rule Mutect2_for_PON:
         -I {input.bam} \
         -tumor $SM \
         -L refGenome/intervals.bed \
-        -O data/PON/{wildcards.normFragment}
+        -O {output.var}
         '''
 
 rule GenomicsDBImport:
     input: 
         expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
     output:
-        "data/combined_somatic_PON/vcfheader.vcf", 
+        expand("data/combined_somatic_PON/vcfheader.vcf"), 
     log: 
 	"logs/gatk/genomicsdbimport.log"
     params:
@@ -446,8 +446,10 @@ rule GenomicsDBImport:
         extra="",  # optional
         java_opts="",  # optional
     threads:2
-    script: ./genomicsdbimport.py
-    conda: ./environment.yaml
+    conda:
+        "environment.yaml"
+    script: 
+        "genomicsdbimport.py"
    # wrapper:
     #    "v0.75.0/bio/gatk/genomicsdbimport"
     #shell:
