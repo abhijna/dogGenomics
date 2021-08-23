@@ -49,17 +49,6 @@ def get_normalTable(wildcards):
     else:
         return normAr[0]
 
-
-#class Object(object):
-#    pass
-
-#sample = Object()
-
-#for id in tumFragment_ids:
-#    sample.tumFragment=id
-#    get_normal(sample)
-
-
 rule all:
     input:
          expand("qc/fastqc/fastq/{read}_fastqc.{ext}", read=read_ids, ext=['html', 'zip']),
@@ -77,11 +66,10 @@ rule all:
 	 expand("data/recalib/{fragment}.txt", fragment=fragment_ids),
          expand("data/recalib/{fragment}.bam", fragment=fragment_ids),
          expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
-         expand("data/combined_somatic_PON/vcfheader.vcf")
-       #  "data/combined_somatic_PON/vcfheader.vcf",
-       #  "data/PON.vcf.gz",
-       # expand("data/rawVC/{tumFragment}.vcf.gz", tumFragment=tumFragment_ids),
-       # expand("data/realign/{tumFragment}.bam", tumFragment=tumFragment_ids),
+         directory("data/combined_somatic_PON"),
+         "data/PON.vcf.gz",
+         expand("data/rawVC/{tumFragment}.vcf.gz", tumFragment=tumFragment_ids),
+         expand("data/realign/{tumFragment}.bam", tumFragment=tumFragment_ids),
        # "data/population/commonAlt.vcf",
        # expand("data/pileupsum/{fragment}.table", fragment=fragment_ids),
        # expand("data/cont/{tumFragment}.table", tumFragment=tumFragment_ids),
@@ -428,6 +416,7 @@ rule Mutect2_for_PON:
         gatk --java-options "-Xmx15G" Mutect2 \
         -R {input.ref} \
         -I {input.bam} \
+        --max-mnp-distance 0 \
         -tumor $SM \
         -L refGenome/intervals.bed \
         -O {output.var}
@@ -435,36 +424,34 @@ rule Mutect2_for_PON:
 
 rule GenomicsDBImport:
     input: 
-        expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
+        vcfs=expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
     output:
-        expand("data/combined_somatic_PON/vcfheader.vcf"), 
-    log: 
-	"logs/gatk/genomicsdbimport.log"
-    params:
-        intervals="ref",
-        db_action="create", # optional
-        extra="",  # optional
-        java_opts="",  # optional
-    threads:2
-    conda:
-        "environment.yaml"
-    script: 
-        "genomicsdbimport.py"
-   # wrapper:
-    #    "v0.75.0/bio/gatk/genomicsdbimport"
-    #shell:
-     #   '''
-      #  pon_var=(data/PON/*/*.vcf.gz)
-       # gatk --java-options "-Xmx15G" GenomicsDBImport \ 
-       # $(printf " -V %s" "${{pon_var[@]}}") \
-	#--genomicsdb-workspace-path data/combined_somatic_PON \
+        directory("data/combined_somatic_PON"),
+    conda: "gatk4.yml"
+    shell:
+        '''
+        inputs=()
+        for vcf in {input.vcfs};do
+            input_vcf=$" -V "$vcf;
+            inputs+=($input_vcf);
+        done
+        gatk --java-options "-Xmx15G" \
+        GenomicsDBImport ${{inputs[*]}} \
+        --merge-input-intervals \
+        --genomicsdb-workspace-path data/combined_somatic_PON \
+        -L refGenome/intervals.bed
+        #pon_var=(data/PON/*/*.vcf.gz)
+        #gatk --java-options "-Xmx15G" \
+        #GenomicsDBImport $(printf " -V %s" "${{pon_var[@]}}") \
+        #--merge-input-intervals \
+        #--genomicsdb-workspace-path data/combined_somatic_PON \
         #-L refGenome/intervals.bed
-        #'''
+        '''
 
 # https://software.broadinstitute.org/gatk/documentation/tooldocs/4.0.9.0/org_broadinstitute_hellbender_tools_walkers_mutect_CreateSomaticPanelOfNormals.php
 rule CreateSomaticPON:
     input:
-        expand("data/PON/{normFragment}.vcf.gz", normFragment=normFragment_ids),
+        "refGenome/gatkIndex/genome.fa",
     output:
         "data/PON.vcf.gz",
     resources:
@@ -473,20 +460,18 @@ rule CreateSomaticPON:
     threads:1
     conda: "gatk4.yml" 
     shell:
-        '''
-        #module load Java/jdk1.8.0
-        #source activate gatk
-        pon_var=(data/PON/*/*.vcf.gz)
-        gatk --java-options "-Xmx15G"  CreateSomaticPanelOfNormals \
-        $(printf " -V %s" "${pon_var[@]}") \
-        -O {output}
-        '''
+        """
+        gatk --java-options "-Xmx15G" CreateSomaticPanelOfNormals -R {input} \
+        -V gendb://data/combined_somatic_PON \
+        -O {output} 
+        """
 
 # https://software.broadinstitute.org/gatk/documentation/tooldocs/4.beta.4/org_broadinstitute_hellbender_tools_walkers_mutect_Mutect2.php  ## manily for the section about "How GATK4 Mutect2 differs from GATK3 MuTect2"
 # https://software.broadinstitute.org/gatk/documentation/tooldocs/4.0.9.0/org_broadinstitute_hellbender_tools_walkers_mutect_Mutect2.php
 # remove "--disable-read-filter MateOnSameContigOrNoMappedMateReadFilter". This is needed for alt-aware mapping
 # Add "--genotype-pon-sites": The panel of normals represents common germline variant sites and also commonly noisy sites in sequencing data. By default, the tool does not reassemble nor emit variant sites that match identically to a PoN variant. To enable genotyping of PoN sites, use the --genotype-pon-sites option. If the match is not exact, e.g. there is an allele-mismatch, the tool reassembles the region, emits the calls and annotates matches in the INFO field with IN_PON.
-#
+rule somaticVarCalling:
+    
 
 rule somaticVarCalling:
     input:
@@ -501,10 +486,9 @@ rule somaticVarCalling:
         walltime = lambda wildcards, attempt: 2**(attempt - 1) * 60 * 60 * 24,
         mem = lambda wildcards, attempt: 2**(attempt - 1) * 1000000000 * 8
     threads:1
+    conda: "gatk4.yml"
     shell:
-        '''
-        module load Java/jdk1.8.0
-        source activate gatk
+        """
         # We need to create these files regardless, even if they stay empty
         #touch {output.realignedBam}
         mkdir -p $(dirname tmp6/{wildcards.tumFragment}.normal_name.txt)
@@ -531,7 +515,7 @@ rule somaticVarCalling:
         -L refGenome/intervals.bed \
         -O {output.rawVar} \
         -bamout {output.realignedBam}
-        '''
+        """
 
 #            ${"--orientation-bias-artifact-priors " + artifact_prior_table} \
 
